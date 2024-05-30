@@ -13,6 +13,7 @@ import com.zack.zojbackendmodel.common.ErrorCode;
 import com.zack.zojbackendmodel.dto.question.JudgeCase;
 import com.zack.zojbackendmodel.entity.Question;
 import com.zack.zojbackendmodel.entity.QuestionSubmit;
+import com.zack.zojbackendmodel.entity.UserRank;
 import com.zack.zojbackendmodel.enums.QuestionSubmitEnum;
 import com.zack.zojbackendmodel.exception.BusinessException;
 import com.zack.zojbackendserviceclient.service.QuestionFeignClient;
@@ -96,6 +97,19 @@ public class JudgeServiceImpl implements JudgeService {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
         }
         QuestionSubmit questionSubmitResult = questionFeignClient.getQuestionSubmitById(questionSubmitId);
+
+        judgeInfo = JSONUtil.toBean(questionSubmitResult.getJudgeInfo(), JudgeInfo.class);
+            if ("Accepted".equals(judgeInfo.getMessage())) {
+                // 增加用户Ac数
+                UserRank acUpdateUserRank = new UserRank();
+                acUpdateUserRank.setId(questionFeignClient.getUserRankIdByUserId(questionSubmitResult.getUserId()));
+                acUpdateUserRank.setAcNum(questionFeignClient.getUserRankUserACNumByUserId(questionSubmitResult.getUserId()) + 1);
+                questionFeignClient.updateUserRank(acUpdateUserRank);
+                // 增加题目Ac数
+                question.setAcceptNum(question.getAcceptNum() + 1);
+                questionFeignClient.updateQuestion(question);
+            }
+
         return questionSubmitResult;
     }
 }

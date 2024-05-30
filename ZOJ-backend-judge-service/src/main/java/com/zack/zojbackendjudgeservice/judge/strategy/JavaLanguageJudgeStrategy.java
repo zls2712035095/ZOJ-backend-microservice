@@ -10,6 +10,7 @@ import com.zack.zojbackendmodel.enums.JudgeResultEnum;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * java判题策略
@@ -27,7 +28,7 @@ public class JavaLanguageJudgeStrategy implements JudgeStrategy{
         Long memory = Optional.ofNullable(judgeInfo.getMemory()).orElse(0L);
         Long time = Optional.ofNullable(judgeInfo.getTime()).orElse(0L);
         List<String> inputList = judgeContext.getInputList();
-        List<String> outputList = judgeContext.getOutputList();
+        List<String> outputList = judgeContext.getOutputList().stream().map(str -> str.trim()).collect(Collectors.toList());
         Question question = judgeContext.getQuestion();
         List<JudgeCase> judgeCaseList = judgeContext.getJudgeCaseList();
         JudgeResultEnum judgeInfoMessageEnum = JudgeResultEnum.Accepted;
