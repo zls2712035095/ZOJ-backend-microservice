@@ -105,6 +105,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         long userRankId = userRankService.getUserRankIdByUserId(userId);
         UserRank userRank = new UserRank();
         userRank.setId(userRankId);
+        userRank.setUserName(loginUser.getUserName());
         userRank.setSubmitNum(userRankService.getUserRankSubmitNum(userId) + 1);
         userRankService.updateById(userRank);
         // 执行判题服务
